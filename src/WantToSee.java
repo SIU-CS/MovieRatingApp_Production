@@ -19,6 +19,7 @@ public class WantToSee {
 	
 	
 	public WantToSee(String title){
+		
 		MovieTitle = title;
 		JSONObject output;
 		try {
