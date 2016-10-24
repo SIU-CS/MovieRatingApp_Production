@@ -5,6 +5,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.Scanner;
 
+import org.json.*;
+
 public class WantToSee {
 	
 	private String MovieTitle;
@@ -18,13 +20,13 @@ public class WantToSee {
 	
 	public WantToSee(String title){
 		MovieTitle = title;
-		String output;
+		JSONObject output;
 		try {
 			output = SearchWithTitle(title);
-			ReleaseDate = output;
-			Plot = output;
-			IMDBRating = output;
-		} catch (IOException e) {
+			ReleaseDate =  output.getString("Released");
+			Plot =  output.getString("Plot");
+			IMDBRating =  output.getString("imdbRating");
+		} catch (IOException | JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -34,13 +36,13 @@ public class WantToSee {
 	
 	public WantToSee(String title, String year){
 		MovieTitle = title;
-		ReleaseDate = year;
-		String output;
+		JSONObject output;
 		try {
 			output = SearchWithTitleAndYear(title, year);
-			Plot = output;
-			IMDBRating = output;
-		} catch (IOException e) {
+			Plot = output.getString("Plot");
+			IMDBRating = output.getString("imdbRating");
+			ReleaseDate = output.getString("Released");
+		} catch (IOException | JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -80,7 +82,7 @@ public class WantToSee {
 		Plot = plot;
 	}
 
-	private String SearchWithTitle(String title) throws IOException{
+	private JSONObject SearchWithTitle(String title) throws IOException, JSONException{
 		String query = String.format("t=%s",URLEncoder.encode(title, CHARSET));
 		    
 
@@ -90,10 +92,11 @@ public class WantToSee {
 		Scanner scanner = new Scanner(response); 
 		String responseBody = scanner.useDelimiter("\\A").next();
 		scanner.close();
-		return responseBody;
+		JSONObject json = new JSONObject(responseBody);
+		return json;
 	}
 	
-	private String SearchWithTitleAndYear(String title, String year) throws IOException{
+	private JSONObject SearchWithTitleAndYear(String title, String year) throws IOException, JSONException{
 		String query = String.format("t=%s&y=%s",URLEncoder.encode(title, CHARSET), year);
 		    
 
@@ -103,7 +106,8 @@ public class WantToSee {
 		Scanner scanner = new Scanner(response); 
 		String responseBody = scanner.useDelimiter("\\A").next();
 		scanner.close();
-		return responseBody;
+		JSONObject json = new JSONObject(responseBody);
+		return json;
 	}
 
 

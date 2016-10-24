@@ -74,9 +74,16 @@ public class Main {
 				MainMenu();
 			}
 			if(selection.equals("2")){
-				for(int i=0; i < WantToSeeList.size(); i++){
+				if(WantToSeeList.isEmpty()){
+					System.out.println("The list is empty");
+					MainMenu();
+				}
+				else{	
+					for(int i=0; i < WantToSeeList.size(); i++){
 					WantToSee movie = WantToSeeList.get(i);
 					System.out.println(movie.toString());
+					System.out.println();
+					}	
 					MainMenu();
 				}
 			}
