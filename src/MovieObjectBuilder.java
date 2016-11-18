@@ -7,30 +7,28 @@ import java.util.Scanner;
 
 import org.json.*;
 
-public class WantToSee {
+public class MovieObjectBuilder {
 	
 	private String MovieTitle;
 	private String ReleaseDate;
 	private String Plot;
 	private String IMDBRating;
+	private String myRating;
 	
-	final String URL = "http://www.omdbapi.com/?";
-	final String CHARSET = "UTF-8";
+	private final String URL = "http://www.omdbapi.com/?";
+	private final String CHARSET = "UTF-8";
 	
 	
-	public WantToSee(String title){
-		
+	public MovieObjectBuilder(String title){
 		MovieTitle = title;
+		myRating = "n/a";
 		JSONObject output;
 		try {
 			output = SearchWithTitle(title);
 			ReleaseDate =  output.getString("Released");
 			Plot =  output.getString("Plot");
 			IMDBRating =  output.getString("imdbRating");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JSONException e) {
+		} catch (IOException | JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -38,15 +36,16 @@ public class WantToSee {
 		
 	}
 	
-	public WantToSee(String title, String year){
+	public MovieObjectBuilder(String title, String year){
 		MovieTitle = title;
-		ReleaseDate = year;
-		String output;
+		myRating = "n/a";
+		JSONObject output;
 		try {
 			output = SearchWithTitleAndYear(title, year);
-			Plot = output;
-			IMDBRating = output;
-		} catch (IOException e) {
+			Plot = output.getString("Plot");
+			IMDBRating = output.getString("imdbRating");
+			ReleaseDate = output.getString("Released");
+		} catch (IOException | JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -85,6 +84,14 @@ public class WantToSee {
 	public void setPlot(String plot) {
 		Plot = plot;
 	}
+	
+	public String getMyRating(){
+		return myRating;
+	}
+	
+	public void setMyRating(String myrating){
+		myRating = myrating;
+	}
 
 	private JSONObject SearchWithTitle(String title) throws IOException, JSONException{
 		String query = String.format("t=%s",URLEncoder.encode(title, CHARSET));
@@ -97,12 +104,10 @@ public class WantToSee {
 		String responseBody = scanner.useDelimiter("\\A").next();
 		scanner.close();
 		JSONObject json = new JSONObject(responseBody);
-		//String name = obj.getString("Title");
-		//System.out.println(name);
 		return json;
 	}
 	
-	private String SearchWithTitleAndYear(String title, String year) throws IOException{
+	private JSONObject SearchWithTitleAndYear(String title, String year) throws IOException, JSONException{
 		String query = String.format("t=%s&y=%s",URLEncoder.encode(title, CHARSET), year);
 		    
 
@@ -112,16 +117,18 @@ public class WantToSee {
 		Scanner scanner = new Scanner(response); 
 		String responseBody = scanner.useDelimiter("\\A").next();
 		scanner.close();
-		return responseBody;
+		JSONObject json = new JSONObject(responseBody);
+		return json;
 	}
 
 
 	@Override
 	public String toString() {
-		return "getMovieTitle()=" +  getMovieTitle()
-				+  "\n" +"getReleaseDate()=" + getReleaseDate() 
-				+ "\n" + "getPlot()=" + getPlot()
-				+ "\n" + "getIMDBRating()=" + getIMDBRating(); 
+		return "[MOVIE TITLE] " +  getMovieTitle()
+				+  "\n" +"[RELEASE DATE] " + getReleaseDate() 
+				+ "\n" + "[PLOT] " + getPlot()
+				+ "\n" + "[IMDB RATING] " +getIMDBRating() 
+				+ "\n" + "[MY RATING] " + getMyRating();
 				
 	}
 
