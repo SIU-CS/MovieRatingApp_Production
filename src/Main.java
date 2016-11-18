@@ -172,8 +172,16 @@ public class Main {
 				title = sc.nextLine();
 				MovieObjectBuilder movie = new MovieObjectBuilder(title);
 				System.out.println("How would you rate this movie?  (1 to 5)");
-				String rating = scan.next();
-				movie.setMyRating(rating);
+				boolean tryAgain = true;
+				while(tryAgain){
+					String rating = scan.next();
+					if(rating.equals("1")||rating.equals("2")||rating.equals("3")||rating.equals("4")||rating.equals("5")){
+						movie.setMyRating(rating);
+						tryAgain = false;
+					}else{
+						System.out.println("You must enter a number between 1 and 5");
+					}
+				}
 				HaveSeenList.add(movie);
 				MainMenu();
 			}
