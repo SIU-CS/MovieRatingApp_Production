@@ -30,7 +30,7 @@
 	</target>
 
 	<target name="clean-build" depends="clean,jar" />
-	<target name="main" depends="clean,jar" />
+	<target name="main" depends="clean,jar,junit" />
 
 <property name="test.report.dir" value="./tests" />
 <mkdir dir="${test.report.dir}" />
@@ -46,7 +46,7 @@
 		<formatter type="plain" />
 		<batchtest todir="${test.report.dir}">
 			<fileset dir="${src.dir}">
-				<include name="**/*Test.java" />
+				<include name="edu/siu/movie/MainTest.java" />
 			</fileset>
 		</batchtest>
 	</junit>
