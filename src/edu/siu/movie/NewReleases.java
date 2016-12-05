@@ -1,3 +1,4 @@
+package edu.siu.movie;
 
 public class NewReleases{
 
