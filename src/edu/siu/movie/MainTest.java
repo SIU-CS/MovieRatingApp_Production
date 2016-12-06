@@ -29,11 +29,7 @@ public class MainTest {
 
 	@Test
 	public void test() {
-		final int ARRAYSIZE = 500;
-		MovieObjectBuilder[] array = new MovieObjectBuilder[ARRAYSIZE];
-		MovieObjectBuilder movie = new MovieObjectBuilder("Nightmare On Elm Street", "1985");
-		array[0] = movie;
-		assertEquals("1985", array[0].getReleaseDate());
+		
 	}
 
 }

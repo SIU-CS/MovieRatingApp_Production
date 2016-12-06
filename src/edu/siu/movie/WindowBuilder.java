@@ -1,33 +1,43 @@
 package edu.siu.movie;
 
-
-
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ListIterator;
-import java.util.Scanner;
-import java.util.LinkedList;
 
-
-import javax.swing.AbstractAction;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.DefaultListModel;
+import javax.swing.JTabbedPane;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
+import javax.swing.JList;
+import javax.swing.AbstractAction;
+import javax.swing.ListSelectionModel;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.LinkedList;
+import java.util.ListIterator;
+
+import javax.swing.Action;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
+
+import javax.swing.JScrollPane;
 
 
-public class GUIBuilder extends JFrame{
+
+public class WindowBuilder extends JFrame {
 	
 	static LinkedList<MovieObjectBuilder> WantToSeeList = new LinkedList<MovieObjectBuilder>();
 	static LinkedList<MovieObjectBuilder> NewReleasesList = new LinkedList<MovieObjectBuilder>();
@@ -35,18 +45,27 @@ public class GUIBuilder extends JFrame{
 	static LinkedList<MovieObjectBuilder> HaveSeenList = new LinkedList<MovieObjectBuilder>();
 	
 	
+	JList haveSeenList = new JList();
+	JList newReleasesList = new JList();
+	JList recomendationsList = new JList();
+	JList wantToSeeList = new JList();
 	
-
+	
 	private JPanel contentPane;
 	private JTextField haveSeenTextField;
 	private JTextField wantToSeeTextField;
 	private JTextField haveSeenRatingText;
 	JTextPane haveSeenTextPane = new JTextPane();
+	JTextPane wantToSeeTextPane = new JTextPane();
+	JTextPane newReleasesTextPane = new JTextPane();
+	JTextPane recomendationsTextPane = new JTextPane();
 	
 
-	/**
-	 * Launch the application.
-	 */
+	DefaultListModel dlm_WantToSee = new DefaultListModel();
+	DefaultListModel dlm_HaveSeen = new DefaultListModel();
+	
+	
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -60,10 +79,11 @@ public class GUIBuilder extends JFrame{
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
-	public GUIBuilder() {
+
+	public WindowBuilder() {
+		
+		
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 683, 408);
 		contentPane = new JPanel();
@@ -80,25 +100,52 @@ public class GUIBuilder extends JFrame{
 		haveSeenTextField = new JTextField();
 		haveSeenTextField.setColumns(10);
 		
-		JButton btnAdd_HaveSeen = new JButton("<< Add To List");
+		// HAVE SEEN
 		
-		//JTextPane haveSeenTextPane = new JTextPane();
+		
+		JButton btnAdd_HaveSeen = new JButton("<< Add To List");
+		btnAdd_HaveSeen.addActionListener(new ActionListener() {               
+			public void actionPerformed(ActionEvent e) {
+				actionAddToList_HaveSeen();
+			}
+		});
+		
+		
+		
 		
 		JButton btnSearch_HaveSeen = new JButton("Search");
-		btnSearch_HaveSeen.addActionListener(new ActionListener() {               //jhjhjhjhjhjhjhjhjhjhjhjhj
+		btnSearch_HaveSeen.addActionListener(new ActionListener() {               
 			public void actionPerformed(ActionEvent e) {
 				actionHaveSeenSearch();
 			}
 		});
 		
-		JList haveSeenList = new JList();
+		
 		
 		haveSeenRatingText = new JTextField();
 		haveSeenRatingText.setColumns(10);
 		
 		JButton btnAddYourRating = new JButton("Add Your Rating");
+		btnAddYourRating.addActionListener(new ActionListener() {               
+			public void actionPerformed(ActionEvent e) {
+				actionAddYourRating();
+			}
+
+		});
+		
+		
 		
 		JButton btnDeleteFromList = new JButton("Delete From List");
+		btnDeleteFromList.addActionListener(new ActionListener() {               
+			public void actionPerformed(ActionEvent e) {
+				actionDelete_HaveSeen();
+			}
+
+		});
+		
+		
+		
+		
 		GroupLayout gl_haveSeenPanel = new GroupLayout(haveSeenPanel);
 		gl_haveSeenPanel.setHorizontalGroup(
 			gl_haveSeenPanel.createParallelGroup(Alignment.LEADING)
@@ -124,6 +171,34 @@ public class GUIBuilder extends JFrame{
 							.addComponent(haveSeenTextPane, GroupLayout.PREFERRED_SIZE, 350, GroupLayout.PREFERRED_SIZE)
 							.addGap(32))))
 		);
+		haveSeenTextPane.setEditable(false);
+		
+		
+		
+		
+		haveSeenList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				MovieObjectBuilder movie = (MovieObjectBuilder) haveSeenList.getSelectedValue();
+				Document doc = haveSeenTextPane.getDocument();
+				if(!haveSeenList.isSelectionEmpty()){
+			      try {
+			    	haveSeenTextPane.setText("");
+					doc.insertString(doc.getLength(), "Title: " + movie.getMovieTitle() + "\n", null);
+					doc.insertString(doc.getLength(), "Release Date: " + movie.getReleaseDate() + "\n", null);
+					doc.insertString(doc.getLength(), "IMDB Rating: " + movie.getIMDBRating() + "\n", null);
+					doc.insertString(doc.getLength(), "Plot: " + movie.getPlot() + "\n", null);
+					doc.insertString(doc.getLength(), "My Rating: " + movie.getMyRating() + "\n", null);
+				} catch (BadLocationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			}
+		});
+		
+		
+		
+		
 		gl_haveSeenPanel.setVerticalGroup(
 			gl_haveSeenPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_haveSeenPanel.createSequentialGroup()
@@ -148,6 +223,16 @@ public class GUIBuilder extends JFrame{
 		);
 		haveSeenPanel.setLayout(gl_haveSeenPanel);
 		
+		
+		
+		
+		
+		
+		
+		//WANT TO SEE
+		
+		
+		
 		JPanel wantToSeePanel = new JPanel();
 		tabbedPane.addTab("Want To See", null, wantToSeePanel, null);
 		
@@ -155,14 +240,29 @@ public class GUIBuilder extends JFrame{
 		wantToSeeTextField.setColumns(10);
 		
 		JButton btnAdd_WantToSee = new JButton("<< Add To List");
+		btnAdd_WantToSee.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionAddToList_WantToSee();
+			}
+		});
 		
-		JTextPane wantToSeeTextPane = new JTextPane();
+		
+		wantToSeeTextPane.setEditable(false);
 		
 		JButton btnSearch_WantToSee = new JButton("Search");
+		btnSearch_WantToSee.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionSearch_WantToSee();
+			}
+		});
 		
-		JList wantToSeeList = new JList();
 		
 		JButton btnDelete_WantToSee = new JButton("Delete From List");
+		btnDelete_WantToSee.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionDelete_WantToSee();
+			}
+		});
 		GroupLayout gl_wantToSeePanel = new GroupLayout(wantToSeePanel);
 		gl_wantToSeePanel.setHorizontalGroup(
 			gl_wantToSeePanel.createParallelGroup(Alignment.LEADING)
@@ -184,6 +284,30 @@ public class GUIBuilder extends JFrame{
 							.addComponent(wantToSeeTextPane, GroupLayout.PREFERRED_SIZE, 350, GroupLayout.PREFERRED_SIZE)
 							.addGap(32))))
 		);
+		
+		
+		
+		
+		wantToSeeList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				MovieObjectBuilder movie = (MovieObjectBuilder) wantToSeeList.getSelectedValue();
+				Document doc = wantToSeeTextPane.getDocument();
+				if(!wantToSeeList.isSelectionEmpty()){
+			      try {
+			    	wantToSeeTextPane.setText("");
+					doc.insertString(doc.getLength(), "Title: " + movie.getMovieTitle() + "\n", null);
+					doc.insertString(doc.getLength(), "Release Date: " + movie.getReleaseDate() + "\n", null);
+					doc.insertString(doc.getLength(), "IMDB Rating: " + movie.getIMDBRating() + "\n", null);
+					doc.insertString(doc.getLength(), "Plot: " + movie.getPlot() + "\n", null);
+				} catch (BadLocationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			}
+		});
+		
+		
 		gl_wantToSeePanel.setVerticalGroup(
 			gl_wantToSeePanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_wantToSeePanel.createSequentialGroup()
@@ -204,16 +328,39 @@ public class GUIBuilder extends JFrame{
 		);
 		wantToSeePanel.setLayout(gl_wantToSeePanel);
 		
+		
+		
+		
+		
+		
+		
+		
+		// RECOMENDATIONS
+		
+		
+		
+		
 		JPanel recomendationsPanel = new JPanel();
 		tabbedPane.addTab("Recomendations", null, recomendationsPanel, null);
 		
 		JButton btnGetRecomendations = new JButton("Get Recomendations");
+		btnGetRecomendations.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionGetRecomendations();
+			}
+		});
 		
-		JTextPane recomendationsTextPane = new JTextPane();
 		
-		JList recomendationsList = new JList();
+		recomendationsTextPane.setEditable(false);
+		
+		
 		
 		JButton btnDelete_Recomendations = new JButton("Delete From List");
+		btnDelete_Recomendations.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				actionDelete_Recomendations();
+			}
+		});
 		GroupLayout gl_recomendationsPanel = new GroupLayout(recomendationsPanel);
 		gl_recomendationsPanel.setHorizontalGroup(
 			gl_recomendationsPanel.createParallelGroup(Alignment.LEADING)
@@ -231,6 +378,29 @@ public class GUIBuilder extends JFrame{
 							.addComponent(btnGetRecomendations, GroupLayout.PREFERRED_SIZE, 170, GroupLayout.PREFERRED_SIZE)
 							.addGap(100))))
 		);
+		
+		
+		recomendationsList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				MovieObjectBuilder movie = (MovieObjectBuilder) recomendationsList.getSelectedValue();
+				Document doc = recomendationsTextPane.getDocument();
+				if(!recomendationsList.isSelectionEmpty()){
+			      try {
+			    	recomendationsTextPane.setText("");
+					doc.insertString(doc.getLength(), "Title: " + movie.getMovieTitle() + "\n", null);
+					doc.insertString(doc.getLength(), "Release Date: " + movie.getReleaseDate() + "\n", null);
+					doc.insertString(doc.getLength(), "IMDB Rating: " + movie.getIMDBRating() + "\n", null);
+					doc.insertString(doc.getLength(), "Plot: " + movie.getPlot() + "\n", null);
+				} catch (BadLocationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			}
+		});
+		
+		
+		
 		gl_recomendationsPanel.setVerticalGroup(
 			gl_recomendationsPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(Alignment.TRAILING, gl_recomendationsPanel.createSequentialGroup()
@@ -248,26 +418,42 @@ public class GUIBuilder extends JFrame{
 		);
 		recomendationsPanel.setLayout(gl_recomendationsPanel);
 		
+		
+		
+		//   NEW RELEASES  
+		
+		
+		
 		JPanel newReleasesPane = new JPanel();
 		tabbedPane.addTab("New Releases", null, newReleasesPane, null);
 		
 		JButton btnGetNewReleases = new JButton("Get New Releases");
+		btnGetNewReleases.addActionListener(new ActionListener() {               
+			public void actionPerformed(ActionEvent e) {
+				actionGetNewReleases();
+			}
+
+		});
 		
-		JTextPane newReleasesTextPane = new JTextPane();
-		
-		JList newReleasesList = new JList();
 		
 		JButton btnDelete_NewReleases = new JButton("Delete From List");
+		btnDelete_NewReleases.addActionListener(new ActionListener() {               
+			public void actionPerformed(ActionEvent e) {
+				actionDelete_NewReleases();
+			}
+
+		});
 		GroupLayout gl_newReleasesPane = new GroupLayout(newReleasesPane);
 		gl_newReleasesPane.setHorizontalGroup(
 			gl_newReleasesPane.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 652, Short.MAX_VALUE)
 				.addGroup(gl_newReleasesPane.createSequentialGroup()
 					.addGap(19)
 					.addGroup(gl_newReleasesPane.createParallelGroup(Alignment.LEADING)
 						.addComponent(btnDelete_NewReleases, GroupLayout.PREFERRED_SIZE, 163, GroupLayout.PREFERRED_SIZE)
-						.addComponent(newReleasesList, GroupLayout.PREFERRED_SIZE, 204, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
+						.addGroup(gl_newReleasesPane.createSequentialGroup()
+							.addGap(8)
+							.addComponent(newReleasesList, GroupLayout.PREFERRED_SIZE, 204, GroupLayout.PREFERRED_SIZE)))
+					.addPreferredGap(ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
 					.addGroup(gl_newReleasesPane.createParallelGroup(Alignment.TRAILING)
 						.addGroup(gl_newReleasesPane.createSequentialGroup()
 							.addComponent(newReleasesTextPane, GroupLayout.PREFERRED_SIZE, 350, GroupLayout.PREFERRED_SIZE)
@@ -276,35 +462,237 @@ public class GUIBuilder extends JFrame{
 							.addComponent(btnGetNewReleases, GroupLayout.PREFERRED_SIZE, 170, GroupLayout.PREFERRED_SIZE)
 							.addGap(100))))
 		);
+		newReleasesTextPane.setEditable(false);
 		gl_newReleasesPane.setVerticalGroup(
-			gl_newReleasesPane.createParallelGroup(Alignment.LEADING)
-				.addGap(0, 331, Short.MAX_VALUE)
-				.addGroup(Alignment.TRAILING, gl_newReleasesPane.createSequentialGroup()
+			gl_newReleasesPane.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_newReleasesPane.createSequentialGroup()
 					.addGap(21)
 					.addComponent(btnGetNewReleases)
 					.addPreferredGap(ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
 					.addComponent(newReleasesTextPane, GroupLayout.PREFERRED_SIZE, 212, GroupLayout.PREFERRED_SIZE)
 					.addGap(25))
-				.addGroup(Alignment.TRAILING, gl_newReleasesPane.createSequentialGroup()
+				.addGroup(gl_newReleasesPane.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(newReleasesList, GroupLayout.PREFERRED_SIZE, 260, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
 					.addComponent(btnDelete_NewReleases)
 					.addContainerGap())
 		);
+		
+		
+		
+		
+		
+		newReleasesList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				MovieObjectBuilder movie = (MovieObjectBuilder) newReleasesList.getSelectedValue();
+				Document doc = newReleasesTextPane.getDocument();
+				if(!newReleasesList.isSelectionEmpty()){
+			      try {
+			    	newReleasesTextPane.setText("");
+					doc.insertString(doc.getLength(), "Title: " + movie.getMovieTitle() + "\n", null);
+					doc.insertString(doc.getLength(), "Release Date: " + movie.getReleaseDate() + "\n", null);
+					doc.insertString(doc.getLength(), "IMDB Rating: " + movie.getIMDBRating() + "\n", null);
+					doc.insertString(doc.getLength(), "Plot: " + movie.getPlot() + "\n", null);
+				} catch (BadLocationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+			}
+		});
 		newReleasesPane.setLayout(gl_newReleasesPane);
 	}
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	//  HAVE SEEN
+	
 	private void actionHaveSeenSearch(){
-		String text = haveSeenTextField.getText();
-		   try {
-			      Document doc = haveSeenTextPane.getDocument();
-			      doc.insertString(doc.getLength(), text, null);
-			   } catch(BadLocationException exc) {
-			      exc.printStackTrace();
-		  }
+		String title = haveSeenTextField.getText();
+		if(title != null && !title.isEmpty()){
+			MovieObjectBuilder movie = new MovieObjectBuilder(title);
+			Document doc = haveSeenTextPane.getDocument();
+			haveSeenTextPane.setText("");
+			try {
+				doc.insertString(doc.getLength(), "Title: " + movie.getMovieTitle() + "\n", null);
+				doc.insertString(doc.getLength(), "Release Date: " + movie.getReleaseDate() + "\n", null);
+				doc.insertString(doc.getLength(), "IMDB Rating: " + movie.getIMDBRating() + "\n", null);
+				doc.insertString(doc.getLength(), "Plot: " + movie.getPlot() + "\n", null);
+				doc.insertString(doc.getLength(), "My Rating: " + movie.getMyRating() + "\n", null);
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			}
+			
+		}
 			
 	}
+	
+	private void actionAddToList_HaveSeen(){
+		String title = haveSeenTextField.getText();
+		MovieObjectBuilder movie = new MovieObjectBuilder(title);
+		dlm_HaveSeen.addElement(movie);
+		haveSeenList.setModel(dlm_HaveSeen);
+		haveSeenTextField.setText("");
+	}
+	
+	private void actionAddYourRating(){
+		String rating = haveSeenRatingText.getText();
+		int index = haveSeenList.getSelectedIndex();
+		MovieObjectBuilder movie = (MovieObjectBuilder) dlm_HaveSeen.getElementAt(index);
+		movie.setMyRating(rating);
+		HaveSeenList.add(movie);
+		dlm_HaveSeen.setElementAt(movie, index);
+		Document doc = haveSeenTextPane.getDocument();
+		haveSeenTextPane.setText("");
+		haveSeenRatingText.setText("");
+		try {
+			doc.insertString(doc.getLength(), "Title: " + movie.getMovieTitle() + "\n", null);
+			doc.insertString(doc.getLength(), "Release Date: " + movie.getReleaseDate() + "\n", null);
+			doc.insertString(doc.getLength(), "IMDB Rating: " + movie.getIMDBRating() + "\n", null);
+			doc.insertString(doc.getLength(), "Plot: " + movie.getPlot() + "\n", null);
+			doc.insertString(doc.getLength(), "My Rating: " + movie.getMyRating() + "\n", null);
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void actionDelete_HaveSeen(){
+		int index = haveSeenList.getSelectedIndex();
+		if(index >=0){
+			haveSeenTextPane.setText("");
+			((DefaultListModel) haveSeenList.getModel()).removeElementAt(index);
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	//   WANT TO SEE
+	
+	private void actionSearch_WantToSee(){
+		String title = wantToSeeTextField.getText();
+		if(title != null && !title.isEmpty()){
+			MovieObjectBuilder movie = new MovieObjectBuilder(title);
+			Document doc = wantToSeeTextPane.getDocument();
+			wantToSeeTextPane.setText("");
+			try {
+				doc.insertString(doc.getLength(), "Title: " + movie.getMovieTitle() + "\n", null);
+				doc.insertString(doc.getLength(), "Release Date: " + movie.getReleaseDate() + "\n", null);
+				doc.insertString(doc.getLength(), "IMDB Rating: " + movie.getIMDBRating() + "\n", null);
+				doc.insertString(doc.getLength(), "Plot: " + movie.getPlot() + "\n", null);
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	
+	private void actionAddToList_WantToSee(){
+		String title = wantToSeeTextField.getText();
+		MovieObjectBuilder movie = new MovieObjectBuilder(title);
+		dlm_WantToSee.addElement(movie);
+		wantToSeeList.setModel(dlm_WantToSee);
+	}
+	
+	private void actionDelete_WantToSee(){
+		int index = wantToSeeList.getSelectedIndex();
+		if(index >=0){
+			wantToSeeTextPane.setText("");
+			((DefaultListModel) wantToSeeList.getModel()).removeElementAt(index);
+		}
+	}
+	
+	
+	
+	
+	// RECOMENDATIONS
+	
+	private void actionGetRecomendations(){
+		if(HaveSeenList.isEmpty()){
+			showError("You must have at least one rated movie in your have seen list");
+		}
+		else{	
+			MovieObjectBuilder highestRated = FindHighestRatedMovie();
+			Recommendations rec = new Recommendations(highestRated);
+			DefaultListModel dlm = new DefaultListModel();
+			MovieObjectBuilder[] recArray = rec.getRecommendationList();
+			for(int i=0; i< recArray.length; i++){
+				RecommendationList.add(recArray[i]);
+				System.out.println(recArray[i].toString());
+				System.out.println();
+				dlm.addElement(recArray[i]);
+			}
+			recomendationsList.setModel(dlm);
+		}
+			
+	}
+	
+	private void actionDelete_Recomendations(){
+		int index = recomendationsList.getSelectedIndex();
+		if(index >=0){
+			recomendationsTextPane.setText("");
+			((DefaultListModel) recomendationsList.getModel()).removeElementAt(index);
+		}
+	}
+	
+	
+	// NEW RELEASES
+	
+	private void actionGetNewReleases(){
+		NewReleases relist = new NewReleases();
+		MovieObjectBuilder[] rearray = relist.getNewReleaseList();
+		DefaultListModel dlm = new DefaultListModel();
+		for(int i=0; i<rearray.length; i++){
+			NewReleasesList.add(rearray[i]);
+			System.out.println(rearray[i].toString());
+			System.out.println();
+			dlm.addElement(rearray[i]);
+		}
+		newReleasesList.setModel(dlm);
+	}
+	
+	private void actionDelete_NewReleases(){
+		int index = newReleasesList.getSelectedIndex();
+		if(index >=0){
+			newReleasesTextPane.setText("");
+			((DefaultListModel) newReleasesList.getModel()).removeElementAt(index);
+		}
+	}
+	
+	
+	
+	
+	private MovieObjectBuilder FindHighestRatedMovie(){
+		ListIterator<MovieObjectBuilder> iterator = HaveSeenList.listIterator();
+		MovieObjectBuilder highestrated = HaveSeenList.get(0);
+		while(iterator.hasNext()){
+			MovieObjectBuilder current = iterator.next();
+			if(Integer.parseInt(current.getMyRating()) > Integer.parseInt(highestrated.getMyRating())){
+				highestrated = current;
+			}
+		}
+		
+		return highestrated;
+	}
+	
+	
+	
+	
+	// Show dialog box with error message.
+		private void showError(String errorMessage) {
+			JOptionPane.showMessageDialog(this, errorMessage, "Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	
 	
 	private class SwingAction extends AbstractAction {
@@ -314,51 +702,8 @@ public class GUIBuilder extends JFrame{
 		}
 		public void actionPerformed(ActionEvent e) {
 		}
+		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 	
@@ -585,6 +930,7 @@ public class GUIBuilder extends JFrame{
 		return highestrated;
 	}
 */
-	
-	
+
+
 }
+	
