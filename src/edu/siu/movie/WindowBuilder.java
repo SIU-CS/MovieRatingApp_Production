@@ -686,8 +686,6 @@ public class WindowBuilder extends JFrame {
 	}
 	
 	
-	
-	
 	// Show dialog box with error message.
 		private void showError(String errorMessage) {
 			JOptionPane.showMessageDialog(this, errorMessage, "Error",

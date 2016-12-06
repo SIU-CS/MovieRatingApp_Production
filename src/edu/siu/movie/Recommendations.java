@@ -28,7 +28,7 @@ public class Recommendations{
 		this.highestRated = highestRated;
 		title = highestRated.getMovieTitle();
 		try {
-			ID = FindMovieID();
+			this.ID = FindMovieID();
 		} catch (IOException | JSONException e) {
 			e.printStackTrace();
 		}
@@ -65,7 +65,7 @@ public class Recommendations{
 			
 			return id;
 		}
-	
+
 	
 	
 	public MovieObjectBuilder[] getRecommendationList(){

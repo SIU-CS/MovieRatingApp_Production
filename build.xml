@@ -46,7 +46,8 @@
 		<formatter type="plain" />
 		<batchtest todir="${test.report.dir}">
 			<fileset dir="${src.dir}">
-				<include name="edu/siu/movie/MainTest.java" />
+				<include name="edu/siu/movie/MovieObjectBuilderTest.java" />
+				<include name="edu/siu/movie/SecondAPIclassTest.java" />
 			</fileset>
 		</batchtest>
 	</junit>
